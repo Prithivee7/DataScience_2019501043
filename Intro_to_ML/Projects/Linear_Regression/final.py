@@ -5,143 +5,108 @@ Created on Fri Oct 23 11:08:14 2020
 @author: Prithivee Ramalingam
 """
 
-import warnings
-warnings.filterwarnings('always')
-warnings.filterwarnings('ignore')
-
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib import style
-import seaborn as sns
-#import missingno as msno
-#configure
-# sets matplotlib to inline and displays graphs below the corressponding cell.
-#
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score,mean_squared_error
 
-#import the necessary modelling algos.
+def load_data_sets():
+    train=pd.read_csv('V:/DataScience_2019501043/Intro_to_ML/Projects/Linear_Regression/train.csv')
+    test= pd.read_csv('V:/DataScience_2019501043/Intro_to_ML/Projects/Linear_Regression/test.csv')
+    return train,test
 
-#classifiaction.
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC,SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
+def explore(train,test):
+    print(train.head)
+    print(test.head)
 
+    print(train.info())
+    print(test.info())
 
-from sklearn.linear_model import LinearRegression,Ridge,Lasso,RidgeCV
-from sklearn.ensemble import RandomForestRegressor,BaggingRegressor,GradientBoostingRegressor,AdaBoostRegressor
-from sklearn.svm import SVR
-from sklearn.neighbors import KNeighborsRegressor
+    print(train.isnull().sum())
+    print(test.isnull().sum())
 
-#model selection
-from sklearn.model_selection import train_test_split,cross_validate
-from sklearn.model_selection import KFold
-from sklearn.model_selection import GridSearchCV
+def encoding(dataframe):
+    print(dataframe['season'].head)
+    dataframe['season'] = dataframe['season'].map({1:'Spring',2:'Summer',3:'Fall',4:'Winter'})
+    dataframe['holiday'] = dataframe['holiday'].map({0:'Nholiday',1:'Holiday'})
+    dataframe['workingday'] = dataframe['workingday'].map({0:'Off',1:'Workday'})
+    print(dataframe['season'].head)
+    return dataframe
 
-#evaluation metrics
-from sklearn.metrics import mean_squared_log_error,mean_squared_error, r2_score,mean_absolute_error # for regression
-from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score  # for classification
+def visualisation(train):
+    train_sample = encoding(train)
+    
+    train_sample.groupby('season')['count'].sum().plot.bar()
+    train_sample.groupby('holiday')['count'].sum().plot.bar()
+    train_sample.groupby('workingday')['count'].sum().plot.bar()
+    
+def convert_date_time(dataframe):
+    #Converting the attribute datetime from object to datetime type
+    dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
+    dataframe['year'] = dataframe['datetime'].dt.year
+    dataframe['month'] = dataframe['datetime'].dt.month
+    dataframe['hour'] = dataframe['datetime'].dt.hour
+    dataframe['DayOfWeek'] = dataframe['datetime'].dt.dayofweek
+    return dataframe
+    
+def feature_selection(train,test):
+    x_train = train[['weather','temp',
+                                 'atemp','humidity','windspeed','year','month','hour','DayOfWeek']]
+    y_train = train['count']
 
+    x_test = test[['weather','temp','atemp',
+                   'humidity','windspeed','year','month','hour','DayOfWeek']]
+    return x_train,y_train,x_test
 
-train=pd.read_csv('V:/DataScience_2019501043/Intro_to_ML/Projects/Linear_Regression/train.csv')
-test= pd.read_csv('V:/DataScience_2019501043/Intro_to_ML/Projects/Linear_Regression/test.csv')
-df=train.copy()
-test_df=test.copy()
-print(df.head())
+def train_valid_splitting(x_train, y_train):
+    x_train, x_validate, y_train, y_validate = train_test_split(x_train, y_train, test_size = 0.2, random_state = 42)
+    return x_train, x_validate, y_train, y_validate
 
-df.columns.unique()
+def linear_regression(x_train, y_train, x_validate,y_validate):
+    lr = LinearRegression().fit(x_train,y_train)
+    y_predicted_value = lr.predict(x_validate)
+    print('r2_score for linear regression:',r2_score(y_validate,y_predicted_value))
+    print('rmse for linear regression:',np.sqrt(mean_squared_error(y_validate,y_predicted_value)))     
 
-season=pd.get_dummies(df['season'],prefix='season')
-df=pd.concat([df,season],axis=1)
-df.head()
-season=pd.get_dummies(test_df['season'],prefix='season')
-test_df=pd.concat([test_df,season],axis=1)
-test_df.head()
+def decision_tree_regressor(x_train, y_train, x_validate,y_validate):
+    dt = DecisionTreeRegressor().fit(x_train,y_train)
+    y_predicted_value = dt.predict(x_validate)
+    print('r2_score for decision tree regressor:',r2_score(y_validate,y_predicted_value))
+    print('rmse for decision tree regressor:',np.sqrt(mean_squared_error(y_validate,y_predicted_value))) 
 
+def random_forest_regressor(x_train, y_train, x_validate,y_validate):
+    rf = RandomForestRegressor().fit(x_train,y_train)
+    y_predicted_value = rf.predict(x_validate)
+    print('r2_score for random forest regressor:',r2_score(y_validate,y_predicted_value))
+    print('rmse for random forest regressor:',np.sqrt(mean_squared_error(y_validate,y_predicted_value)))
+    return y_predicted_value
+         
+def ridge_regressor(x_train, y_train, x_validate, y_validate):
+    rr = Ridge().fit(x_train,y_train)
+    y_predicted_value = rr.predict(x_validate)
+    print('r2_score for ridge regression:',r2_score(y_validate,y_predicted_value))
+    print('rmse for ridge regression:',np.sqrt(mean_squared_error(y_validate,y_predicted_value)))
 
-weather=pd.get_dummies(df['weather'],prefix='weather')
-df=pd.concat([df,weather],axis=1)
-df.head()
-weather=pd.get_dummies(test_df['weather'],prefix='weather')
-test_df=pd.concat([test_df,weather],axis=1)
-test_df.head()
+def submit(y_predicted_value, test):
+    sample_submission = pd.DataFrame({'datetime':x_test['datetime'],'count':y_predicted_value})
+    sample_submission.to_csv('final2.csv',index=False)
 
+train,test = load_data_sets()
+visualisation(train)
+train = convert_date_time(train)
+test = convert_date_time(test)
 
+x_train,y_train,x_test = feature_selection(train,test)
+x_train, x_validate, y_train, y_validate = train_valid_splitting(x_train,y_train)
+print(x_train.info())
+linear_regression(x_train, y_train, x_validate, y_validate)
+decision_tree_regressor(x_train, y_train, x_validate,y_validate)
+y_predicted_value = random_forest_regressor(x_train, y_train, x_validate,y_validate)
+ridge_regressor(x_train, y_train, x_validate, y_validate)
+#submit(y_predicted_value,test)
 
-# # # now can drop weather and season.
-df.drop(['season','weather'],inplace=True,axis=1)
-df.head()
-test_df.drop(['season','weather'],inplace=True,axis=1)
-
-
-df["hour"] = [t.hour for t in pd.DatetimeIndex(df.datetime)]
-df["day"] = [t.dayofweek for t in pd.DatetimeIndex(df.datetime)]
-df["month"] = [t.month for t in pd.DatetimeIndex(df.datetime)]
-df['year'] = [t.year for t in pd.DatetimeIndex(df.datetime)]
-df['year'] = df['year'].map({2011:0, 2012:1})
-df.head()
-
-
-test_df["hour"] = [t.hour for t in pd.DatetimeIndex(test_df.datetime)]
-test_df["day"] = [t.dayofweek for t in pd.DatetimeIndex(test_df.datetime)]
-test_df["month"] = [t.month for t in pd.DatetimeIndex(test_df.datetime)]
-test_df['year'] = [t.year for t in pd.DatetimeIndex(test_df.datetime)]
-test_df['year'] = test_df['year'].map({2011:0, 2012:1})
-
-df.drop('datetime',axis=1,inplace=True)
-df.head()
-
-df.drop(['casual','registered'],axis=1,inplace=True)
-
-#new_df=df.copy()
-#new_df.temp.describe()
-#new_df['temp_bin']=np.floor(new_df['temp'])//5
-#new_df['temp_bin'].unique()
-# now we can visualize as follows
-#sns.factorplot(x="temp_bin",y="count",data=new_df,kind='bar')
-
-
-df.columns.to_series().groupby(df.dtypes).groups
-
-x_train,x_test,y_train,y_test=train_test_split(df.drop('count',axis=1),df['count'],test_size=0.25,random_state=42)
-
-#models=[RandomForestRegressor(),AdaBoostRegressor(),BaggingRegressor(),SVR(),KNeighborsRegressor()]
-#model_names=['RandomForestRegressor','AdaBoostRegressor','BaggingRegressor','SVR','KNeighborsRegressor']
-#rmsle=[]
-#d={}
-#for model in range (len(models)):
-    #clf=models[model]
-    #clf.fit(x_train,y_train)
-    #test_pred=clf.predict(x_test)
-    #rmsle.append(np.sqrt(mean_squared_log_error(test_pred,y_test)))
-#d={'Modelling Algo':model_names,'RMSLE':rmsle}   
-#d
-
-#rmsle_frame=pd.DataFrame(d)
-#rmsle_frame
-
-no_of_test=[500]
-params_dict={'n_estimators':no_of_test,'n_jobs':[-1],'max_features':["auto",'sqrt','log2']}
-clf_rf=GridSearchCV(estimator=RandomForestRegressor(),param_grid=params_dict,scoring='neg_mean_squared_log_error')
-clf_rf.fit(x_train,y_train)
-pred=clf_rf.predict(x_test)
-print((np.sqrt(mean_squared_log_error(pred,y_test))))
-
-n_neighbors=[]
-for i in range (0,50,5):
-    if(i!=0):
-        n_neighbors.append(i)
-params_dict={'n_neighbors':n_neighbors,'n_jobs':[-1]}
-clf_knn=GridSearchCV(estimator=KNeighborsRegressor(),param_grid=params_dict,scoring='neg_mean_squared_log_error')
-clf_knn.fit(x_train,y_train)
-pred=clf_knn.predict(x_test)
-print((np.sqrt(mean_squared_log_error(pred,y_test))))
-
-
-pred=clf_rf.predict(test_df.drop('datetime',axis=1))
-d={'datetime':test['datetime'],'count':pred}
-ans=pd.DataFrame(d)
-ans.to_csv('answer.csv',index=False) # saving to a csv file for predictions on kaggle.
 
