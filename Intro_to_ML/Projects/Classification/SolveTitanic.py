@@ -5,35 +5,36 @@ Created on Sat Oct 17 12:29:11 2020
 @author: Prithivee Ramalingam
 """
 
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
 
+from sklearn.linear_model import LogisticRegression #supervised
+from sklearn.svm import SVC #unsupervised
+from sklearn.neighbors import KNeighborsClassifier #supervised
+from sklearn.tree import DecisionTreeClassifier #supervised
+from sklearn.ensemble import RandomForestClassifier #supervised
 
-direct = 'V:/DataScience_2019501043/Intro_to_ML/Projects/Logistic_Regression'
+direct = 'V:/DataScience_2019501043/Intro_to_ML/Projects/Classification'
 test = direct +'/test.csv'
 train = direct +'/train.csv'
 
 test = pd.read_csv(test)
 train = pd.read_csv(train)
 
-#print(train.info())
-#print(test.info())
+print(train.info())
+print(test.info())
 
-#print(train.isnull().sum())
-#print(test.isnull().sum())
+print(train.isnull().sum())
+print(test.isnull().sum())
 
 
 train_test_data = [train, test] # combining train and test dataset
 #print("test train size")
-#print(train.size)
-#print(test.size)
+#print(train_test_data)
+#print(len(train_test_data))
 
 fig = plt.figure(figsize=(18,6))
 
@@ -71,9 +72,7 @@ for dataset in train_test_data:
     #print(dataset)
     dataset['Title'] = dataset.Name.str.extract(' ([A-Za-z]+)\.')
 
-#print(dataset['Title'])
-#print("----------")
-#To show relationship between 2 variables. Also called contingency table
+
 s = pd.crosstab(train['Title'], train['Sex'])
 #print(s)
 #print("***************")
@@ -106,8 +105,9 @@ for dataset in train_test_data:
     #print(dataset.Embarked.unique())
     dataset['Embarked'] = dataset['Embarked'].map({'S': 0, 'C': 1, 'Q': 2}).astype(int)
 
+#Divide into 5 bins , they will have unequal number of entities
 train['AgeBand'] = pd.cut(train['Age'], 5)
-#print(train['AgeBand'])
+print(train['AgeBand'])
 
 for dataset in train_test_data:
     dataset.loc[ dataset['Age'] <= 16, 'Age'] = 0
@@ -121,7 +121,7 @@ for dataset in train_test_data:
     
 #Divide into 4 bins, Each bin should have equal number of entities
 train['FareBand'] = pd.qcut(train['Fare'], 4)
-#print(train['FareBand'])
+print(train['FareBand'])
 
 for dataset in train_test_data:
     dataset.loc[ dataset['Fare'] <= 7.91, 'Fare'] = 0
@@ -129,7 +129,7 @@ for dataset in train_test_data:
     dataset.loc[(dataset['Fare'] > 14.454) & (dataset['Fare'] <= 31), 'Fare']   = 2
     dataset.loc[ dataset['Fare'] > 31, 'Fare'] = 3
     dataset['Fare'] = dataset['Fare'].astype(int)
-        
+    
 features_drop = ['Name', 'SibSp', 'Parch', 'Ticket', 'Cabin']
 train = train.drop(features_drop, axis=1)
 test = test.drop(features_drop, axis=1)
@@ -146,53 +146,40 @@ X_train = train.drop('Survived', axis=1)
 y_train = train['Survived']
 X_test = test.drop("PassengerId", axis=1)
 
+k_fold = KFold(n_splits = 10, shuffle = True, random_state = 0)
 
-#clf is the mean training accuracy.
-#precision score, accuracy sore, recall score and f1 score
-clf = LogisticRegression()
-clf.fit(X_train, y_train)
-y_pred_log_reg = clf.predict(X_test)
-acc_log_reg = round(clf.score(X_train, y_train) * 100, 2)
-print ("Logistic Regression = "+str(acc_log_reg) + ' percent')
+logisticRegression = LogisticRegression()
+score = cross_val_score(logisticRegression, X_train, y_train, cv=k_fold)
+#print(score)
+print("Logistic Regression = "+str(score.mean()))
 
-clf = SVC()
-clf.fit(X_train, y_train)
-y_pred_svc = clf.predict(X_test)
-acc_svc = round(clf.score(X_train, y_train) * 100, 2)
-print ("SVC = "+str(acc_svc) + ' percent')
-
-clf = KNeighborsClassifier(n_neighbors = 3)
-clf.fit(X_train, y_train)
-y_pred_knn = clf.predict(X_test)
-acc_knn = round(clf.score(X_train, y_train) * 100, 2)
-print ("K Neighbors Classifier = "+str(acc_knn) + ' percent')
-
-clf = DecisionTreeClassifier()
-clf.fit(X_train, y_train)
-y_pred_decision_tree = clf.predict(X_test)
-acc_decision_tree = round(clf.score(X_train, y_train) * 100, 2)
-print ("Decision Tree Classifier = "+str(acc_decision_tree) + ' percent')
-
-clf = RandomForestClassifier(n_estimators=100)
-clf.fit(X_train, y_train)
-y_pred_random_forest = clf.predict(X_test)
-acc_random_forest = round(clf.score(X_train, y_train) * 100, 2)
-print ("Random Forest Classifier = "+str(acc_random_forest) + ' percent')
+svc = SVC()
+score = cross_val_score(svc, X_train, y_train, cv=k_fold)
+#print(score)
+print("Support Vector Classifiers = "+str(score.mean()))
 
 
-models = pd.DataFrame({
-    'Model': ['Logistic Regression', 'Support Vector Machines', 
-              'KNN', 'Decision Tree', 'Random Forest'],
-    
-    'Score': [acc_log_reg, acc_svc, 
-              acc_knn,  acc_decision_tree, acc_random_forest]
-    })
+knc = KNeighborsClassifier()
+score = cross_val_score(knc, X_train, y_train, cv=k_fold)
+#print(score)
+print("K Neighbours Classifier = "+str(score.mean()))
 
-models.sort_values(by='Score', ascending=False)
 
-submission = pd.DataFrame({
-        "PassengerId": test["PassengerId"],
-        "Survived": y_pred_random_forest
-    })
+d_tree = DecisionTreeClassifier()
+score = cross_val_score(d_tree, X_train, y_train, cv=k_fold)
+#print(score)
+print("Decision Tree = "+str(score.mean()))
+
+
+rfc = RandomForestClassifier(n_estimators=100)
+score = cross_val_score(rfc, X_train, y_train, cv=k_fold)
+#print(score)
+print("Random Forest Classifier = "+str(score.mean()))
+
+
+#submission = pd.DataFrame({
+#        "PassengerId": test["PassengerId"],
+#        "Survived": y_pred_random_forest
+#    })
 
 #submission.to_csv('submission.csv', index=False)
