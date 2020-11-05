@@ -14,6 +14,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score,mean_squared_error
 
+#19 days , 12 months for 2 years
+#11 days, 12 months for 2 years - for every hour find the number of rentals
 def load_data_sets():
     train=pd.read_csv('V:/DataScience_2019501043/Intro_to_ML/Projects/Linear_Regression/train.csv')
     test= pd.read_csv('V:/DataScience_2019501043/Intro_to_ML/Projects/Linear_Regression/test.csv')
@@ -63,11 +65,11 @@ def feature_selection(train,test):
     return x_train,y_train,x_test
 
 def train_valid_splitting(x_train, y_train):
-    x_train, x_validate, y_train, y_validate = train_test_split(x_train, y_train, test_size = 0.2, random_state = 42)
+    x_train, x_validate, y_train, y_validate = train_test_split(x_train, y_train, test_size = 0.35, random_state = 42)
     return x_train, x_validate, y_train, y_validate
 
 def linear_regression(x_train, y_train, x_validate,y_validate):
-    lr = LinearRegression().fit(x_train,y_train)
+    lr = LinearRegression().fit(x_train,y_train)       
     y_predicted_value = lr.predict(x_validate)
     print('r2_score for linear regression:',r2_score(y_validate,y_predicted_value))
     print('rmse for linear regression:',np.sqrt(mean_squared_error(y_validate,y_predicted_value)))     
@@ -92,14 +94,23 @@ def ridge_regressor(x_train, y_train, x_validate, y_validate):
     print('rmse for ridge regression:',np.sqrt(mean_squared_error(y_validate,y_predicted_value)))
 
 def submit(y_predicted_value, test):
-    sample_submission = pd.DataFrame({'datetime':x_test['datetime'],'count':y_predicted_value})
-    sample_submission.to_csv('final2.csv',index=False)
+    #sample_submission = pd.DataFrame({'datetime':x_test['datetime'],'count':y_predicted_value})
+    #sample_submission.to_csv('final2.csv',index=False)
+    
+    sample_submission = pd.read_csv('sampleSubmission.csv')
+    #predicted_count_RFR = RandomForestRegressor.predict(X_test)
+    sample_submission['count'] = pd.Series(y_predicted_value.clip(0))
+    sample_submission.to_csv('Output.csv', index = False)
 
-train,test = load_data_sets()
+train, test = load_data_sets()
+explore(train,test)
 visualisation(train)
+visualisation(test)
 train = convert_date_time(train)
 test = convert_date_time(test)
 
+#root mean squared error. The smaller the better
+#r squared tells how close the data is to the regression line
 x_train,y_train,x_test = feature_selection(train,test)
 x_train, x_validate, y_train, y_validate = train_valid_splitting(x_train,y_train)
 print(x_train.info())
@@ -107,6 +118,5 @@ linear_regression(x_train, y_train, x_validate, y_validate)
 decision_tree_regressor(x_train, y_train, x_validate,y_validate)
 y_predicted_value = random_forest_regressor(x_train, y_train, x_validate,y_validate)
 ridge_regressor(x_train, y_train, x_validate, y_validate)
+
 #submit(y_predicted_value,test)
-
-

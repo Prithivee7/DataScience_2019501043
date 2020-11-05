@@ -40,14 +40,10 @@ fig = plt.figure(figsize=(18,6))
 
 # (2,3) represents the number of rows and columns we want totally. 2 rows and 3 columns
 # The next parameter(0,0) represents that the image should be in 0th row and 0th column
-plt.subplot2grid((2,3),(0,0))
+plt.subplot2grid((2,3),(0,0),colspan = 2)
 # normalise is used to represent the data in percentages
 train.Survived.value_counts(normalize=True).plot(kind="bar",alpha=0.5)
 plt.title("Survived")
-
-plt.subplot2grid((2,3),(0,1))
-plt.scatter(train.Survived,train.Age,alpha=0.1)
-plt.title("Age with respect to survival")
 
 plt.subplot2grid((2,3),(0,2))
 train.Pclass.value_counts(normalize=True).plot(kind="bar",alpha=0.5)
@@ -148,8 +144,8 @@ X_test = test.drop("PassengerId", axis=1)
 
 k_fold = KFold(n_splits = 10, shuffle = True, random_state = 0)
 
-logisticRegression = LogisticRegression()
-score = cross_val_score(logisticRegression, X_train, y_train, cv=k_fold)
+lr = LogisticRegression()
+score = cross_val_score(lr, X_train, y_train, cv=k_fold)
 #print(score)
 print("Logistic Regression = "+str(score.mean()))
 
@@ -170,7 +166,7 @@ score = cross_val_score(d_tree, X_train, y_train, cv=k_fold)
 #print(score)
 print("Decision Tree = "+str(score.mean()))
 
-
+#to improve predictive accuracy and prevent overfitting
 rfc = RandomForestClassifier(n_estimators=100)
 score = cross_val_score(rfc, X_train, y_train, cv=k_fold)
 #print(score)
