@@ -13,6 +13,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score,mean_squared_error
+import matplotlib.pyplot as plt
 
 #19 days , 12 months for 2 years
 #11 days, 12 months for 2 years - for every hour find the number of rentals
@@ -38,13 +39,6 @@ def encoding(dataframe):
     dataframe['workingday'] = dataframe['workingday'].map({0:'Off',1:'Workday'})
     print(dataframe['season'].head)
     return dataframe
-
-def visualisation(train):
-    train_sample = encoding(train)
-    
-    train_sample.groupby('season')['count'].sum().plot.bar()
-    train_sample.groupby('holiday')['count'].sum().plot.bar()
-    train_sample.groupby('workingday')['count'].sum().plot.bar()
     
 def convert_date_time(dataframe):
     #Converting the attribute datetime from object to datetime type
@@ -68,6 +62,8 @@ def train_valid_splitting(x_train, y_train):
     x_train, x_validate, y_train, y_validate = train_test_split(x_train, y_train, test_size = 0.35, random_state = 42)
     return x_train, x_validate, y_train, y_validate
 
+#The RMSE is the square root of the variance of the residuals - absolute fit
+#R2 is godness of fit - distance from the line - relative fit
 def linear_regression(x_train, y_train, x_validate,y_validate):
     lr = LinearRegression().fit(x_train,y_train)       
     y_predicted_value = lr.predict(x_validate)
@@ -79,14 +75,32 @@ def decision_tree_regressor(x_train, y_train, x_validate,y_validate):
     y_predicted_value = dt.predict(x_validate)
     print('r2_score for decision tree regressor:',r2_score(y_validate,y_predicted_value))
     print('rmse for decision tree regressor:',np.sqrt(mean_squared_error(y_validate,y_predicted_value))) 
+    fig, ax = plt.subplots()
+    ax.scatter(y_validate, y_predicted_value, s=2)
+    ax.plot([y_validate.min(), y_validate.max()], [y_validate.min(), y_validate.max()], 'k--', color = 'r', lw=2)
+    ax.set_xlabel('Measured')
+    ax.set_ylabel('Predicted')
 
 def random_forest_regressor(x_train, y_train, x_validate,y_validate):
     rf = RandomForestRegressor().fit(x_train,y_train)
     y_predicted_value = rf.predict(x_validate)
     print('r2_score for random forest regressor:',r2_score(y_validate,y_predicted_value))
     print('rmse for random forest regressor:',np.sqrt(mean_squared_error(y_validate,y_predicted_value)))
+    
+    fig, ax = plt.subplots()
+    #shape
+    ax.scatter(y_validate, y_predicted_value, s=2)
+    ax.plot([y_validate.min(), y_validate.max()], [y_validate.min(), y_validate.max()], 'k--', color = 'r', lw=2)
+    ax.set_xlabel('Measured')
+    ax.set_ylabel('Predicted')
     return y_predicted_value
-         
+
+#ridge regression prevents overfitting by penalising. It can also be applied for collinear points 
+#l2 penalty term leads to reduces the weights of the model to zero or close to zero. 
+#Due to the penalization of weights, our hypothesis gets simpler, more generalized, and less prone to overfitting
+#if lambda is equal to 0. Then it is linear regression
+#Value of lambda is between 0 and infinty. Every weight is shrubnk by lambda(squared of weights)
+
 def ridge_regressor(x_train, y_train, x_validate, y_validate):
     rr = Ridge().fit(x_train,y_train)
     y_predicted_value = rr.predict(x_validate)
@@ -102,10 +116,11 @@ def submit(y_predicted_value, test):
     sample_submission['count'] = pd.Series(y_predicted_value.clip(0))
     sample_submission.to_csv('Output.csv', index = False)
 
+
 train, test = load_data_sets()
 explore(train,test)
-visualisation(train)
-visualisation(test)
+#visualisation(train)
+#visualisation(test)
 train = convert_date_time(train)
 test = convert_date_time(test)
 

@@ -168,9 +168,12 @@ print("Decision Tree = "+str(score.mean()))
 
 #to improve predictive accuracy and prevent overfitting
 rfc = RandomForestClassifier(n_estimators=100)
+rfc.fit(X_train, y_train)
+y_pred_random_forest = rfc.predict(X_test)
 score = cross_val_score(rfc, X_train, y_train, cv=k_fold)
 #print(score)
 print("Random Forest Classifier = "+str(score.mean()))
+#print(y_pred_random_forest)
 
 
 #submission = pd.DataFrame({

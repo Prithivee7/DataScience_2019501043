@@ -1,0 +1,64 @@
+{
+    "aprori.csv": [
+        {
+            "operation": "PASTE",
+            "lines": 10,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:48:04",
+            "keyStrokeInfo": "A,B,C,D,E\r\nA,C,D\r\nD,E\r\nB,C,E\r\nA,B,D,E\r\nA,B\r\nB,D,E\r\nA,B,D\r\nA,D\r\nD,E\r\n",
+            "position": "1,1"
+        },
+        {
+            "operation": "DELETE",
+            "lines": 1,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:50:45",
+            "keyStrokeInfo": "",
+            "position": "10,4"
+        }
+    ],
+    "aprori2.csv": [
+        {
+            "operation": "PASTE",
+            "lines": 11,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:50:40",
+            "keyStrokeInfo": "TID, Items\r\n101, A,B,C,D,E\r\n102, A,C,D\r\n103, D,E\r\n104, B,C,E\r\n105, A,B,D,E\r\n106, A,B\r\n107, B,D,E\r\n108, A,B,D\r\n109, A,D\r\n110, D,E",
+            "position": "1,1"
+        },
+        {
+            "operation": "DELETE",
+            "lines": 0,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:52:15",
+            "keyStrokeInfo": "",
+            "position": "2,5"
+        },
+        {
+            "operation": "DELETE",
+            "lines": 0,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:52:17",
+            "keyStrokeInfo": "",
+            "position": "3,5"
+        },
+        {
+            "operation": "TYPED",
+            "lines": 0,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:52:19",
+            "keyStrokeInfo": " ",
+            "position": "3,5"
+        },
+        {
+            "operation": "TYPED",
+            "lines": 0,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 14:52:19",
+            "keyStrokeInfo": " ",
+            "position": "2,5"
+        }
+    ],
+    "aprori3.csv": [
+        {
+            "operation": "PASTE",
+            "lines": 6,
+            "keyStrokeTimeStamp": "Sat Nov 07 2020 15:06:00",
+            "keyStrokeInfo": "citrus fruit,semi-finished bread,margarine,ready soups\r\ntropical fruit,yogurt,coffee\r\nwhole milk\r\npip fruit,yogurt,cream cheese ,meat spreads\r\nother vegetables,whole milk,condensed milk,long life bakery product\r\nwhole milk,butter,yogurt,rice,abrasive cleaner",
+            "position": "1,1"
+        }
+    ]
+}
