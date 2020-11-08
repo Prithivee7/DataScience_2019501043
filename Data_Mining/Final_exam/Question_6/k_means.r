@@ -9,6 +9,7 @@ set.seed(123)
 res.km <- kmeans(scale(data[,-7]), 4, nstart = 25,iter.max=10)
 #print(res.km)
 
+#plotting and assigning points
 fviz_cluster(res.km, data = data[, -7],
       
              palette = c("#2E9FDF", "#273746", "#E7B800","#D35400"),
