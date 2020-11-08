@@ -18,7 +18,7 @@ y<-as.factor(lensdata[,5])
 x<-lensdata[,1:4]
 
 model1<-rpart(y~.,x, parms = list(split = 'information'),
-              control=rpart.control(minsplit=0,minbucket=0,cp=-1, maxcompete=0, maxsurrogate=0, usesurrogate=0, xval=0,maxdepth=5))
+              control=rpart.control(minsplit=0,minbucket=0, xval=0,maxdepth=5))
 
 
 library(rpart.plot)
