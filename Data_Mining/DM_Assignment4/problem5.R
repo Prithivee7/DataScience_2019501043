@@ -29,21 +29,6 @@ for(dep in 1:6){
                                      type="class"))/length(y_test)
 }
 
-
-overfit.model <- rpart(y~., data = train,
-                       maxdepth= 5, minsplit=2,
-                       minbucket = 1)
-
-
-rpart(y~., data, parms=list(split=c("information","gini")),
-      cp = 0.01, minsplit=20, minbucket=7, maxdepth=30)
-
-
-
-
-
-
-
 minVal<-errors[which.min(errors[,3]),3]
 minDep<-errors[which.min(errors[,3]),1]
 print(c("Lowest test error of ",round(minVal,3),"and tree depth of ",minDep))
