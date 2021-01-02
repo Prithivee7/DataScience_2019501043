@@ -77,11 +77,11 @@ def isfloat(value):
         return True
     except ValueError:
         return False
-        
+
 if __name__ == '__main__':
-    p = Pool(30)
-    df_list = p.map(scrape,symbol)
-    p.close()
+    pool_object = Pool(30)
+    df_list = pool_object.map(scrape,symbol)
+    pool_object.close()
     for ele in df_list:
         if len(ele.columns) > 3:
             close = ele['Close'].tolist()
