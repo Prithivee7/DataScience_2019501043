@@ -4,7 +4,7 @@ Predicting the future stock price of a company using historical records
 2. What type of benefit you might hope to get from data mining?
 	We can understand the fluctuation of the stock price with respect to market habits.
 3. What type of data mining (classification, clustering, etc.) you think would be relevant?
-	Clustering
+	Regression
 4. Name one type of data mining that you think would not be relevant, and describe briefly why not?
 	I think classification will not be relevant because the output which we expect is real values which 
 can be solved through regression. Clustering will return a yes or no type of variable which 

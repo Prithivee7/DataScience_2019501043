@@ -48,7 +48,9 @@ perform_knn <- function(n) {
   ##this function divides the correct predictions by total number of predictions that tell us how accurate teh model is.
   
   accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
-  accuracy(tab)
+  print(accuracy(tab))
+  mis <- 1 - (accuracy(tab)*0.01)
+  print(mis)
 }
 perform_knn(1)
 perform_knn(2)

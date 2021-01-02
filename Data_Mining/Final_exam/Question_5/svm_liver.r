@@ -39,6 +39,7 @@ svm_Linear <- train(V7 ~., data = training, method = "svmLinear",
 
 svm_Linear
 #We get an accuracy score = 0.6884 and kappa = 0.30145
+#Mis = 1 - 0.6884 = 0.3116
 test_pred <- predict(svm_Linear, newdata = testing)
-test_pred
+#test_pred
 
