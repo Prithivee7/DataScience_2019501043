@@ -103,7 +103,6 @@ def bar_graph(dp_top,dp_bottom):
     plt.ylabel('Frequency', fontweight ='bold')
     plt.xticks([r + barWidth for r in range(len(top_new))], 
     dp_new) 
-
     plt.show()
 
     
